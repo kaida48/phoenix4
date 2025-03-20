@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { hash } from "bcrypt";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
     const { username, email, password } = await request.json();
-
-    // Check if user exists by email or username
+    
+    // Check if user exists
     const existingUser = await prisma.user.findFirst({
       where: { 
         OR: [
@@ -49,10 +47,33 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error("Registration error details:", error);
+    
+    // Add more specific error information
+    if (error.code) {
+      console.error("Error code:", error.code);
+    }
+    
     return NextResponse.json(
-      { error: "Something went wrong" },
+      { error: error instanceof Error ? error.message : "Something went wrong" },
       { status: 500 }
     );
   }
 }
+
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
+  
+  console.log("Submitting form with data:", { username, email, password });
+  
+  try {
+    // Rest of your code...
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    setError("Failed to submit form");
+  } finally {
+    setLoading(false);
+  }
+};
