@@ -4,7 +4,10 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FactionType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'; 
+
+// Define FactionType manually if Prisma types aren't available yet
+type FactionType = 'USRF' | 'COALITION' | 'SOUTHPOINT' | 'ALUMNI' | 'VOYAGEURS' | 'BIOMASS' | 'INDEPENDENT';
 
 export default function CreateCharacter() {
   const { data: session, status } = useSession();
