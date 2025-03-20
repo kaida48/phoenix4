@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
@@ -16,13 +16,13 @@ export default function Login() {
     
     try {
       const result = await signIn('credentials', {
-        email,
+        username,
         password,
         redirect: false
       });
 
       if (result?.error) {
-        setError('Invalid email or password');
+        setError('Invalid username or password');
         return;
       }
 
@@ -46,12 +46,12 @@ export default function Login() {
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-300 mb-1" htmlFor="email">Email</label>
+            <label className="block text-gray-300 mb-1" htmlFor="username">Username</label>
             <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               className="w-full p-2 rounded bg-gray-700 text-white"
               required
             />

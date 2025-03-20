@@ -4,10 +4,25 @@ import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { PrismaClient } from '@prisma/client'; 
 
-// Define FactionType manually if Prisma types aren't available yet
+// Define FactionType manually
 type FactionType = 'USRF' | 'COALITION' | 'SOUTHPOINT' | 'ALUMNI' | 'VOYAGEURS' | 'BIOMASS' | 'INDEPENDENT';
+
+// Types for structured data instead of JSON
+type Skill = {
+  name: string;
+  level: number;
+};
+
+type Equipment = {
+  name: string;
+  description: string;
+};
+
+type Relationship = {
+  name: string;
+  type: 'ally' | 'enemy' | 'neutral';
+};
 
 export default function CreateCharacter() {
   const { data: session, status } = useSession();
@@ -20,9 +35,62 @@ export default function CreateCharacter() {
   const [faction, setFaction] = useState<FactionType>('INDEPENDENT');
   const [backstory, setBackstory] = useState('');
   const [appearance, setAppearance] = useState('');
-  const [skills, setSkills] = useState(''); // Will convert to JSON
-  const [equipment, setEquipment] = useState(''); // Will convert to JSON
-  const [relationships, setRelationships] = useState(''); // Will convert to JSON
+
+  // Skills as structured data
+  const [skills, setSkills] = useState<Skill[]>([
+    { name: '', level: 5 }
+  ]);
+  
+  // Equipment as structured data
+  const [equipmentItems, setEquipmentItems] = useState<Equipment[]>([
+    { name: '', description: '' }
+  ]);
+  
+  // Relationships as structured data
+  const [relationships, setRelationships] = useState<Relationship[]>([
+    { name: '', type: 'ally' }
+  ]);
+  
+  // Add/remove form items
+  const addSkill = () => setSkills([...skills, { name: '', level: 5 }]);
+  const removeSkill = (index: number) => {
+    const newSkills = [...skills];
+    newSkills.splice(index, 1);
+    setSkills(newSkills);
+  };
+  
+  const addEquipment = () => setEquipmentItems([...equipmentItems, { name: '', description: '' }]);
+  const removeEquipment = (index: number) => {
+    const newEquipment = [...equipmentItems];
+    newEquipment.splice(index, 1);
+    setEquipmentItems(newEquipment);
+  };
+  
+  const addRelationship = () => setRelationships([...relationships, { name: '', type: 'ally' }]);
+  const removeRelationship = (index: number) => {
+    const newRelationships = [...relationships];
+    newRelationships.splice(index, 1);
+    setRelationships(newRelationships);
+  };
+  
+  // Update form items
+  const updateSkill = (index: number, field: keyof Skill, value: string | number) => {
+    const newSkills = [...skills];
+    newSkills[index] = { ...newSkills[index], [field]: value };
+    setSkills(newSkills);
+  };
+  
+  const updateEquipment = (index: number, field: keyof Equipment, value: string) => {
+    const newEquipment = [...equipmentItems];
+    newEquipment[index] = { ...newEquipment[index], [field]: value };
+    setEquipmentItems(newEquipment);
+  };
+  
+  const updateRelationship = (index: number, field: keyof Relationship, value: string) => {
+    const newRelationships = [...relationships];
+    newRelationships[index] = { ...newRelationships[index], [field]: value };
+    setRelationships(newRelationships);
+  };
   
   // Protect route
   if (status === "unauthenticated") {
@@ -44,10 +112,24 @@ export default function CreateCharacter() {
     setError('');
     
     try {
-      // Parse JSON fields
-      const parsedSkills = skills ? JSON.parse(skills) : {};
-      const parsedEquipment = equipment ? JSON.parse(equipment) : {};
-      const parsedRelationships = relationships ? JSON.parse(relationships) : {};
+      // Convert structured data to JSON objects
+      const skillsObject = skills.reduce((obj, skill) => {
+        if (skill.name) obj[skill.name] = skill.level;
+        return obj;
+      }, {} as Record<string, number>);
+      
+      const equipmentObject = {
+        items: equipmentItems.filter(item => item.name).map(item => ({
+          name: item.name,
+          description: item.description
+        }))
+      };
+      
+      const relationshipsObject = {
+        allies: relationships.filter(r => r.type === 'ally' && r.name).map(r => r.name),
+        enemies: relationships.filter(r => r.type === 'enemy' && r.name).map(r => r.name),
+        neutral: relationships.filter(r => r.type === 'neutral' && r.name).map(r => r.name)
+      };
       
       const response = await fetch('/api/characters', {
         method: 'POST',
@@ -59,9 +141,9 @@ export default function CreateCharacter() {
           faction,
           backstory,
           appearance,
-          skills: parsedSkills,
-          equipment: parsedEquipment,
-          relationships: parsedRelationships
+          skills: skillsObject,
+          equipment: equipmentObject,
+          relationships: relationshipsObject
         }),
       });
       
@@ -169,45 +251,145 @@ export default function CreateCharacter() {
               </div>
             </div>
             
-            {/* Advanced Fields (JSON) */}
+            {/* Skills */}
             <div>
-              <h3 className="text-xl font-semibold mb-4 border-b border-gray-700 pb-2">Advanced Details (JSON Format)</h3>
-              
-              <div className="mb-6">
-                <label htmlFor="skills" className="block text-gray-300 mb-2">Skills (JSON)</label>
-                <textarea
-                  id="skills"
-                  value={skills}
-                  onChange={(e) => setSkills(e.target.value)}
-                  className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 font-mono"
-                  placeholder='{"combat": 8, "speech": 6, "survival": 9}'
-                />
-                <p className="text-gray-400 text-sm mt-1">Enter skills as a JSON object.</p>
+              <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                <h3 className="text-xl font-semibold">Character Skills</h3>
+                <button 
+                  type="button" 
+                  onClick={addSkill}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded"
+                >
+                  Add Skill
+                </button>
               </div>
               
-              <div className="mb-6">
-                <label htmlFor="equipment" className="block text-gray-300 mb-2">Equipment (JSON)</label>
-                <textarea
-                  id="equipment"
-                  value={equipment}
-                  onChange={(e) => setEquipment(e.target.value)}
-                  className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 font-mono"
-                  placeholder='{"weapons": ["Pipe wrench", "9mm pistol"], "armor": "Leather jacket"}'
-                />
-                <p className="text-gray-400 text-sm mt-1">Enter equipment as a JSON object.</p>
+              {skills.map((skill, index) => (
+                <div key={index} className="mb-4 flex items-end gap-2">
+                  <div className="flex-1">
+                    <label className="block text-gray-300 mb-2">Skill Name</label>
+                    <input
+                      type="text"
+                      value={skill.name}
+                      onChange={(e) => updateSkill(index, 'name', e.target.value)}
+                      className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
+                      placeholder="e.g. Combat, Speech, Survival"
+                    />
+                  </div>
+                  <div className="w-24">
+                    <label className="block text-gray-300 mb-2">Level (1-10)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="10"
+                      value={skill.level}
+                      onChange={(e) => updateSkill(index, 'level', parseInt(e.target.value) || 1)}
+                      className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeSkill(index)}
+                    className="bg-red-600 hover:bg-red-700 text-white h-12 px-3 rounded"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            {/* Equipment */}
+            <div>
+              <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                <h3 className="text-xl font-semibold">Equipment</h3>
+                <button 
+                  type="button" 
+                  onClick={addEquipment}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded"
+                >
+                  Add Item
+                </button>
               </div>
               
-              <div className="mb-6">
-                <label htmlFor="relationships" className="block text-gray-300 mb-2">Relationships (JSON)</label>
-                <textarea
-                  id="relationships"
-                  value={relationships}
-                  onChange={(e) => setRelationships(e.target.value)}
-                  className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600 font-mono"
-                  placeholder='{"allies": ["Trader Joe", "Doc Mitchell"], "enemies": ["Raider Boss"]}'
-                />
-                <p className="text-gray-400 text-sm mt-1">Enter relationships as a JSON object.</p>
+              {equipmentItems.map((item, index) => (
+                <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-2 items-end">
+                  <div>
+                    <label className="block text-gray-300 mb-2">Item Name</label>
+                    <input
+                      type="text"
+                      value={item.name}
+                      onChange={(e) => updateEquipment(index, 'name', e.target.value)}
+                      className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
+                      placeholder="e.g. Pipe Wrench, 9mm Pistol"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 mb-2">Description</label>
+                    <input
+                      type="text"
+                      value={item.description}
+                      onChange={(e) => updateEquipment(index, 'description', e.target.value)}
+                      className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
+                      placeholder="e.g. Rusty but functional"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeEquipment(index)}
+                    className="bg-red-600 hover:bg-red-700 text-white h-12 px-3 rounded"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            {/* Relationships */}
+            <div>
+              <div className="flex justify-between items-center mb-4 border-b border-gray-700 pb-2">
+                <h3 className="text-xl font-semibold">Relationships</h3>
+                <button 
+                  type="button" 
+                  onClick={addRelationship}
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded"
+                >
+                  Add Relationship
+                </button>
               </div>
+              
+              {relationships.map((relation, index) => (
+                <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-[2fr_1fr_auto] gap-2 items-end">
+                  <div>
+                    <label className="block text-gray-300 mb-2">Person/Group Name</label>
+                    <input
+                      type="text"
+                      value={relation.name}
+                      onChange={(e) => updateRelationship(index, 'name', e.target.value)}
+                      className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
+                      placeholder="e.g. Trader Joe, USRF Patrol Unit"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 mb-2">Relationship Type</label>
+                    <select
+                      value={relation.type}
+                      onChange={(e) => updateRelationship(index, 'type', e.target.value as 'ally' | 'enemy' | 'neutral')}
+                      className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
+                    >
+                      <option value="ally">Ally</option>
+                      <option value="enemy">Enemy</option>
+                      <option value="neutral">Neutral</option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeRelationship(index)}
+                    className="bg-red-600 hover:bg-red-700 text-white h-12 px-3 rounded"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
             </div>
             
             <button

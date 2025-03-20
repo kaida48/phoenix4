@@ -32,6 +32,9 @@ export default function Dashboard() {
           <nav className="flex items-center gap-6">
             <Link href="/dashboard" className="hover:text-blue-400">Dashboard</Link>
             <Link href="/characters/create" className="hover:text-blue-400">Create Character</Link>
+            {(session?.user?.role === "ADMIN" || session?.user?.role === "MODERATOR") && (
+              <Link href="/admin" className="hover:text-blue-400">Admin Panel</Link>
+            )}
             <Link href="/api/auth/signout" className="hover:text-blue-400">Sign Out</Link>
           </nav>
         </div>

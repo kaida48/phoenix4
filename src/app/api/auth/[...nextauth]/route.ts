@@ -7,22 +7,20 @@ import { type NextAuthOptions } from "next-auth";
 const prisma = new PrismaClient();
 
 export const authOptions: NextAuthOptions = {
-  // Remove the adapter when using CredentialsProvider
-  // adapter: PrismaAdapter(prisma), 
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email" },
+        username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
+        if (!credentials?.username || !credentials?.password) {
           return null;
         }
         
         const user = await prisma.user.findUnique({
-          where: { email: credentials.email }
+          where: { username: credentials.username }
         });
         
         if (!user) {
@@ -37,6 +35,7 @@ export const authOptions: NextAuthOptions = {
         
         return {
           id: user.id,
+          username: user.username,
           email: user.email,
           name: user.name,
           role: user.role
@@ -46,17 +45,17 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, user }) {
-      // Pass user details to token
       if (user) {
         token.id = user.id;
+        token.username = user.username; // Add username to the token
         token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
-      // Pass token details to session
       if (session.user) {
         session.user.id = token.id as string;
+        session.user.username = token.username as string; // Add username to the session
         session.user.role = token.role as string;
       }
       return session;

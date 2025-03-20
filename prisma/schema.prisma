@@ -10,7 +10,8 @@ generator client {
 
 model User {
   id            String      @id @default(cuid())
-  name          String?
+  username      String      @unique // Add username as unique field
+  name          String?     // Keep name as optional
   email         String      @unique
   password      String
   createdAt     DateTime    @default(now())
