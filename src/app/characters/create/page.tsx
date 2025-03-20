@@ -17,6 +17,7 @@ type Skill = {
 type Equipment = {
   name: string;
   description: string;
+  source: string; // How the item was obtained
 };
 
 type Relationship = {
@@ -43,7 +44,7 @@ export default function CreateCharacter() {
   
   // Equipment as structured data
   const [equipmentItems, setEquipmentItems] = useState<Equipment[]>([
-    { name: '', description: '' }
+    { name: '', description: '', source: '' }
   ]);
   
   // Relationships as structured data
@@ -59,7 +60,7 @@ export default function CreateCharacter() {
     setSkills(newSkills);
   };
   
-  const addEquipment = () => setEquipmentItems([...equipmentItems, { name: '', description: '' }]);
+  const addEquipment = () => setEquipmentItems([...equipmentItems, { name: '', description: '', source: '' }]);
   const removeEquipment = (index: number) => {
     const newEquipment = [...equipmentItems];
     newEquipment.splice(index, 1);
@@ -121,7 +122,8 @@ export default function CreateCharacter() {
       const equipmentObject = {
         items: equipmentItems.filter(item => item.name).map(item => ({
           name: item.name,
-          description: item.description
+          description: item.description,
+          source: item.source
         }))
       };
       
@@ -312,16 +314,27 @@ export default function CreateCharacter() {
               </div>
               
               {equipmentItems.map((item, index) => (
-                <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-2 items-end">
+                <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
                   <div>
                     <label className="block text-gray-300 mb-2">Item Name</label>
-                    <input
-                      type="text"
+                    <select
                       value={item.name}
                       onChange={(e) => updateEquipment(index, 'name', e.target.value)}
                       className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
-                      placeholder="e.g. Pipe Wrench, 9mm Pistol"
-                    />
+                    >
+                      <option value="">Select an item...</option>
+                      <option value="Combat Knife">Combat Knife</option>
+                      <option value="9mm Pistol">9mm Pistol</option>
+                      <option value="Assault Rifle">Assault Rifle</option>
+                      <option value="Pipe Wrench">Pipe Wrench</option>
+                      <option value="Leather Jacket">Leather Jacket</option>
+                      <option value="Combat Armor">Combat Armor</option>
+                      <option value="Medical Kit">Medical Kit</option>
+                      <option value="Food Rations">Food Rations</option>
+                      <option value="Water Purifier">Water Purifier</option>
+                      <option value="Radio">Radio</option>
+                      <option value="Custom Item...">Custom Item...</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-gray-300 mb-2">Description</label>
@@ -331,6 +344,16 @@ export default function CreateCharacter() {
                       onChange={(e) => updateEquipment(index, 'description', e.target.value)}
                       className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
                       placeholder="e.g. Rusty but functional"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-300 mb-2">How Obtained</label>
+                    <input
+                      type="text"
+                      value={item.source}
+                      onChange={(e) => updateEquipment(index, 'source', e.target.value)}
+                      className="w-full p-3 rounded bg-gray-700 text-white border border-gray-600"
+                      placeholder="e.g. Found in abandoned bunker"
                     />
                   </div>
                   <button

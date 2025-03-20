@@ -15,20 +15,42 @@ export async function GET(request: Request) {
     }
     
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        role: true,
-        createdAt: true,
+      include: {
         _count: {
           select: { characters: true }
+        },
+        characters: {
+          select: {
+            id: true,
+            name: true,
+            approved: true
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
         }
       },
       orderBy: { createdAt: 'desc' }
     });
     
-    return NextResponse.json(users);
+    // Format the response to include character counts
+    const formattedUsers = users.map(user => ({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      createdAt: user.createdAt,
+      characterCount: user._count.characters,
+      approvedCharacterCount: user.characters.filter(c => c.approved).length,
+      pendingCharacterCount: user.characters.filter(c => !c.approved).length,
+      characters: user.characters.map(c => ({
+        id: c.id,
+        name: c.name,
+        approved: c.approved
+      }))
+    }));
+    
+    return NextResponse.json(formattedUsers);
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(

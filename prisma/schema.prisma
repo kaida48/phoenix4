@@ -9,15 +9,18 @@ generator client {
 }
 
 model User {
-  id            String      @id @default(cuid())
-  username      String      @unique // Add username as unique field
-  name          String?     // Keep name as optional
-  email         String      @unique
-  password      String
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  characters    Character[]
-  role          Role        @default(USER)
+  id                String      @id @default(cuid())
+  username          String      @unique
+  name              String?
+  email             String      @unique
+  emailVerified     DateTime?
+  password          String
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  characters        Character[]
+  role              Role        @default(USER)
+  authToken         String?     @unique
+  verificationToken String?
 }
 
 enum Role {

@@ -1,9 +1,10 @@
 "use client";
 
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 
 type Character = {
   id: string;
@@ -65,6 +66,23 @@ export default function AdminDashboard() {
       console.error('Error updating approval status:', error);
     }
   };
+  
+  const handleDelete = async (id: string) => {
+    if (confirm("Are you sure you want to delete this character?")) {
+      try {
+        const response = await fetch(`/api/admin/characters/${id}`, {
+          method: 'DELETE'
+        });
+        
+        if (response.ok) {
+          // Remove from local state
+          setCharacters(characters.filter(char => char.id !== id));
+        }
+      } catch (error) {
+        console.error('Error deleting character:', error);
+      }
+    }
+  };
 
   if (status === "loading" || loading) {
     return (
@@ -76,16 +94,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <header className="bg-gray-800 shadow-md">
-        <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-          <h1 className="text-xl font-bold">Phoenix Roleplay - Admin</h1>
-          <nav className="flex items-center gap-6">
-            <Link href="/dashboard" className="hover:text-blue-400">Dashboard</Link>
-            <Link href="/admin" className="hover:text-blue-400">Admin Panel</Link>
-            <Link href="/api/auth/signout" className="hover:text-blue-400">Sign Out</Link>
-          </nav>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="container mx-auto px-6 py-8">
         <h2 className="text-2xl font-bold mb-6">Character Approval Dashboard</h2>
@@ -126,7 +135,7 @@ export default function AdminDashboard() {
                     <td className="py-3 px-4">
                       <div className="flex gap-2">
                         <Link 
-                          href={`/admin/characters/${character.id}`}
+                          href={`/characters/${character.id}`}
                           className="px-3 py-1 bg-blue-600 hover:bg-blue-700 rounded text-sm"
                         >
                           View
@@ -146,6 +155,12 @@ export default function AdminDashboard() {
                             Approve
                           </button>
                         )}
+                        <button
+                          onClick={() => handleDelete(character.id)}
+                          className="px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-sm"
+                        >
+                          Delete
+                        </button>
                       </div>
                     </td>
                   </tr>

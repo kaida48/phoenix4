@@ -1,9 +1,10 @@
 'use client'
 
-import { FormEvent, useState } from 'react';
-import { signIn } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import Navbar from '@/components/Navbar';
 
 export default function Login() {
   const [username, setUsername] = useState('');
