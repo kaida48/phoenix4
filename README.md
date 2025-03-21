@@ -1,4 +1,5 @@
 # Project Phoenix - The Official Hub
+> domain = project-phoenix.online
 
 The central platform for everything related to the Phoenix Roleplay universe.
 
