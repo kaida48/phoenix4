@@ -1,26 +1,42 @@
-// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
-}
-
 model User {
   id                String      @id @default(cuid())
-  username          String      @unique
   name              String?
   email             String      @unique
-  emailVerified     DateTime?
   password          String
   createdAt         DateTime    @default(now())
   updatedAt         DateTime    @updatedAt
-  characters        Character[]
   role              Role        @default(USER)
+  username          String      @unique
   authToken         String?     @unique
+  emailVerified     DateTime?
   verificationToken String?
+  characters        Character[]
+}
+
+model Character {
+  id            String      @id @default(uuid())
+  name          String
+  faction       String      // Changed from FactionType enum to String for flexibility
+  backstory     String
+  appearance    String?
+  skills        Json?
+  equipment     Json?
+  relationships Json?
+  approved      Boolean     @default(false)
+  rejected      Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  userId        String
+  user          User        @relation(fields: [userId], references: [id])
 }
 
 enum Role {
@@ -37,21 +53,4 @@ enum FactionType {
   VOYAGEURS
   BIOMASS
   INDEPENDENT
-}
-
-model Character {
-  id            String      @id @default(uuid())
-  name          String
-  faction       String
-  approved      Boolean     @default(false)
-  rejected      Boolean     @default(false)
-  backstory     String      @db.Text
-  appearance    String?     @db.Text
-  skills        Json?
-  equipment     Json?
-  relationships Json?
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  user          User        @relation(fields: [userId], references: [id])
-  userId        String
 }

@@ -162,3 +162,98 @@ Join us in building not just a website, but a digital home for the Phoenix Rolep
 ---
 
 > *Hey, here's Kaida, literally the only developer for this site and this project overall. I came up with the ideas, make the website, document, etc. Just know that I put in lots of love and effort in this and I hope you enjoy it ❤️*
+
+## Phoenix Roleplay
+
+A character submission system for the Phoenix roleplay community.
+
+## Features
+
+- User registration and authentication
+- Character creation and submission
+- Character approval system for moderators
+- Admin panel for user management
+- Responsive design
+
+## Setup Instructions
+
+### Prerequisites
+
+- Node.js (v18+)
+- PostgreSQL database
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
+
+3. Configure environment variables:
+   - Copy `.env.example` to `.env`
+   - Update the DATABASE_URL with your PostgreSQL connection string
+   - Set NEXTAUTH_SECRET to a random secure string
+   - Set NEXTAUTH_URL to your application URL (http://localhost:3000 for development)
+
+4. Set up the database:
+
+   ```bash
+   npx prisma migrate dev
+   # or
+   yarn prisma migrate dev
+   ```
+
+5. Test database connection:
+
+   ```bash
+   npm run test:db
+   # or
+   yarn test:db
+   ```
+
+6. Create an admin user:
+
+   ```bash
+   npm run create:admin
+   # or
+   yarn create:admin
+   ```
+
+7. (Optional) Seed the database with test data:
+
+   ```bash
+   npm run seed:db
+   # or
+   yarn seed:db
+   ```
+
+8. Start the development server:
+
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+
+## Usage
+
+- Visit http://localhost:3000 to access the application
+- Register a new account or log in with existing credentials
+- Create and manage characters
+- Admins can access the admin panel at /admin
+
+## API Endpoints
+
+- `/api/test-db` - Test database connection
+- `/api/register` - User registration
+- `/api/characters` - Character creation and listing
+- `/api/characters/[id]` - Character details and updates
+- `/api/admin/*` - Admin-only endpoints
+
+## License
+
+This project is licensed under the MIT License.
