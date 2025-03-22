@@ -8,42 +8,25 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const id = params.id;
     
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!id) {
+      return NextResponse.json({ error: "Character ID is required" }, { status: 400 });
     }
     
     const character = await prisma.character.findUnique({
-      where: { id: params.id },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true
-          }
-        }
-      }
+      where: { id }
     });
     
-    // Check if character exists
     if (!character) {
       return NextResponse.json({ error: "Character not found" }, { status: 404 });
-    }
-    
-    // Check if user is authorized to view this character
-    const isOwner = character.userId === session.user.id;
-    const isAdmin = session.user.role === "ADMIN" || session.user.role === "MODERATOR";
-    
-    if (!isOwner && !isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
     
     return NextResponse.json(character);
   } catch (error) {
     console.error("Error fetching character:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve character" },
+      { error: "Internal Server Error", details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

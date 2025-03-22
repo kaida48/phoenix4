@@ -40,15 +40,16 @@ enum FactionType {
 }
 
 model Character {
-  id            String      @id @default(cuid())
+  id            String      @id @default(uuid())
   name          String
-  faction       FactionType
+  faction       String
+  approved      Boolean     @default(false)
+  rejected      Boolean     @default(false)
   backstory     String      @db.Text
   appearance    String?     @db.Text
   skills        Json?
   equipment     Json?
   relationships Json?
-  approved      Boolean     @default(false)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   user          User        @relation(fields: [userId], references: [id])

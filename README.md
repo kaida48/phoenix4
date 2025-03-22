@@ -1,4 +1,5 @@
 # Project Phoenix - The Official Hub
+
 > domain = project-phoenix.online
 
 The central platform for everything related to the Phoenix Roleplay universe.
@@ -78,9 +79,9 @@ This project is currently in active development, with the following components b
    - ~~Complete implementation to view all character details~~
    - ~~Add navigation between character views~~
 
-2. **Consistent Navbar**
-   - Create a shared Navbar.tsx component
-   - Ensure it appears consistently on all pages
+2. ~~**Consistent Navbar**~~
+   - ~~Create a shared Navbar.tsx component~~
+   - ~~Ensure it appears consistently on all pages~~
 
 3. **Character Rejection System**
    - Add explicit rejection functionality
@@ -156,7 +157,7 @@ Project Phoenix is an evolving platform that will grow alongside our roleplay co
 
 Join us in building not just a website, but a digital home for the Phoenix Roleplay community—where stories are born, characters come alive, and a rich world awaits exploration.
 
-**Project Phoenix Administration Team**
+### - Project Phoenix Administration Team
 
 ---
 

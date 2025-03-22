@@ -1,9 +1,31 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
-import { type NextAuthOptions } from "next-auth";
+import { type NextAuthOptions, DefaultSession } from "next-auth";
 // Import the singleton Prisma instance instead of creating a new one
 import { prisma } from "@/lib/prisma";
+
+// Extend the default NextAuth types
+declare module "next-auth" {
+  interface User {
+    username: string;
+    role: string;
+  }
+  interface Session {
+    user: {
+      id: string;
+      role: string;
+    } & DefaultSession["user"]
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    username: string;
+    role: string;
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -55,7 +77,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.username = token.username as string; // Add username to the session
+        (session.user as any).username = token.username as string; // Add username to the session
         session.user.role = token.role as string;
       }
       return session;

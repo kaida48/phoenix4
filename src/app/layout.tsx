@@ -24,7 +24,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      suppressHydrationWarning // Add this attribute to suppress hydration warnings
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
