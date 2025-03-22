@@ -74,9 +74,9 @@ This project is currently in active development, with the following components b
 
 ### What Still Needs to be Implemented
 
-1. **Character Detail Page**
-   - Complete implementation to view all character details
-   - Add navigation between character views
+1. ~~**Character Detail Page**~~
+   - ~~Complete implementation to view all character details~~
+   - ~~Add navigation between character views~~
 
 2. **Consistent Navbar**
    - Create a shared Navbar.tsx component
