@@ -83,10 +83,10 @@ This project is currently in active development, with the following components b
    - ~~Create a shared Navbar.tsx component~~
    - ~~Ensure it appears consistently on all pages~~
 
-3. **Character Rejection System**
-   - Add explicit rejection functionality
-   - Implement notifications for rejected characters
-   - Add auto-delete or manual delete options
+3. **~~Character Rejection System~~**
+   - ~~Add explicit rejection functionality~~
+   - ~~Implement notifications for rejected characters~~
+   - ~~Add auto-delete or manual delete options~~
 
 4. **Item Source Tracking**
    - Add fields for how characters obtained items

@@ -74,6 +74,9 @@ export default function AdminNav() {
                 <Link href="/admin/users" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/admin/users')}`}>
                   Manage Users
                 </Link>
+                <Link href="/admin/tokens" className={`px-3 py-2 rounded-md text-sm font-medium ${isActive('/admin/tokens')}`}>
+                  Token Management
+                </Link>
               </div>
             </div>
           </div>
@@ -117,6 +120,9 @@ export default function AdminNav() {
             </Link>
             <Link href="/admin/users" className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/admin/users')}`}>
               Manage Users
+            </Link>
+            <Link href="/admin/tokens" className={`block px-3 py-2 rounded-md text-base font-medium ${isActive('/admin/tokens')}`}>
+              Token Management
             </Link>
             <Link href="/" className="block px-3 py-2 rounded-md text-base font-medium bg-blue-600">
               Back to Main Site

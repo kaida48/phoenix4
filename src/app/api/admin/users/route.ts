@@ -12,6 +12,8 @@ export const prisma =
   });
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
+// Update the GET method to include tokens when requested
+
 export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -23,43 +25,55 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1", 10);
+    const includeTokens = searchParams.get("includeTokens") === "true";
+    
+    // Paginate users with 10 per page
     const users = await prisma.user.findMany({
-      include: {
+      skip: (page - 1) * 10,
+      take: 10,
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        role: true,
+        createdAt: true,
+        authToken: includeTokens, // Only include tokens if explicitly requested
         _count: {
-          select: { characters: true },
+          select: {
+            characters: true
+          }
         },
         characters: {
           select: {
             id: true,
             name: true,
-            approved: true,
-          },
-          orderBy: {
-            createdAt: "desc",
-          },
-          take: 5, // Limit the number of nested characters fetched
-        },
+            approved: true
+          }
+        }
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: {
+        createdAt: "desc"
+      }
     });
 
-    const formattedUsers = users.map((user) => ({
+    // Get total count for pagination
+    const totalUsers = await prisma.user.count();
+
+    // Process users to include character counts
+    const processedUsers = users.map(user => ({
       id: user.id,
       username: user.username,
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,
+      authToken: user.authToken,
       characterCount: user._count.characters,
-      approvedCharacterCount: user.characters.filter((c) => c.approved).length,
-      pendingCharacterCount: user.characters.filter((c) => !c.approved).length,
-      characters: user.characters.map((c) => ({
-        id: c.id,
-        name: c.name,
-        approved: c.approved,
-      })),
+      approvedCharacterCount: user.characters.filter(char => char.approved).length,
+      pendingCharacterCount: user.characters.filter(char => !char.approved).length,
+      characters: user.characters
     }));
 
-    return NextResponse.json(formattedUsers);
+    return NextResponse.json(processedUsers);
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
