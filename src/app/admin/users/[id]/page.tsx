@@ -418,6 +418,36 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-lg font-semibold mb-4">Security Information</h2>
             
+            {/* Password section - ADD THIS */}
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-md font-medium mb-2">Password Information</h3>
+              <div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600 mb-1">Encrypted Password Hash:</p>
+                    <div className="bg-gray-100 p-2 rounded font-mono text-xs overflow-auto break-all">
+                      {user.password || 'No password hash found'}
+                    </div>
+                    <p className="text-sm text-gray-500 mt-2">
+                      This is a one-way bcrypt hash. The original password cannot be recovered.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (confirm('Are you sure you want to reset this user\'s password?')) {
+                        // Implementation for password reset
+                        alert('Password reset functionality to be implemented');
+                      }
+                    }}
+                    className="ml-2 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                  >
+                    Reset Password
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            {/* Existing token section */}
             <div className="mb-6 p-4 bg-gray-50 rounded-lg">
               <h3 className="text-md font-medium mb-2">Authentication Token</h3>
               {user.authToken ? (
