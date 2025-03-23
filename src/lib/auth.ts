@@ -73,21 +73,23 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    jwt: async ({ token, user }) => {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
-        token.role = user.role;
+        token.role = user.role;  // Make sure role is included
+        token.username = user.username;
       }
       return token;
     },
-    session: async ({ session, token }) => {
-      if (token) {
-        session.user.id = token.id;
-        session.user.role = token.role;
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;  // Make sure role is included
+        session.user.username = token.username as string;
       }
       return session;
-    }
+    },
   },
   pages: {
     signIn: "/login",

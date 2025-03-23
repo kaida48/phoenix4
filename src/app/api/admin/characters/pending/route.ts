@@ -3,10 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function POST(
-  request: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -15,22 +12,29 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const characterId = params.id;
-
-    // Approve the character
-    const updatedCharacter = await prisma.character.update({
+    // Fetch pending characters (approved=false, rejected=false)
+    const pendingCharacters = await prisma.character.findMany({
       where: {
-        id: characterId,
-      },
-      data: {
-        approved: true,
+        approved: false,
         rejected: false,
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
-    return NextResponse.json(updatedCharacter);
+    return NextResponse.json(pendingCharacters);
   } catch (error) {
-    console.error("Error approving character:", error);
+    console.error("Error fetching pending characters:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

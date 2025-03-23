@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Navbar from "@/components/Navbar";
+import AdminNav from "@/components/AdminNav";
 
 interface Character {
   id: string;
@@ -68,44 +68,54 @@ export default function AdminUsersPage() {
   };
   
   if (status === 'loading' || loading) {
-    return <div className="p-8 text-center">Loading users...</div>;
+    return (
+      <div className="min-h-screen bg-gray-900 text-white">
+        <AdminNav />
+        <div className="container mx-auto p-6 text-center">Loading users...</div>
+      </div>
+    );
   }
   
   if (error) {
-    return <div className="p-8 text-center text-red-600">Error: {error}</div>;
+    return (
+      <div className="min-h-screen bg-gray-900 text-white">
+        <AdminNav />
+        <div className="container mx-auto p-6 text-center text-red-600">Error: {error}</div>
+      </div>
+    );
   }
   
   return (
     <div className="min-h-screen bg-gray-900 text-white">
-      <Navbar />
+      <AdminNav />
       <main className="container mx-auto px-6 py-8">
         <h1 className="text-2xl font-bold mb-6">User Management</h1>
         
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="p-3 text-left border">Username</th>
-                <th className="p-3 text-left border">Email</th>
-                <th className="p-3 text-left border">Role</th>
-                <th className="p-3 text-left border">Characters</th>
-                <th className="p-3 text-left border">Created At</th>
-                <th className="p-3 text-left border">Actions</th>
+              <tr className="bg-gray-800">
+                <th className="p-3 text-left border border-gray-700">Username</th>
+                <th className="p-3 text-left border border-gray-700">Email</th>
+                <th className="p-3 text-left border border-gray-700">Role</th>
+                <th className="p-3 text-left border border-gray-700">Characters</th>
+                <th className="p-3 text-left border border-gray-700">Created At</th>
+                <th className="p-3 text-left border border-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="border-b hover:bg-gray-50">
-                  <td className="p-3 border">{user.username}</td>
-                  <td className="p-3 border">{user.email}</td>
-                  <td className="p-3 border">{user.role}</td>
-                  <td className="p-3 border">
+                <tr key={user.id} className="border-b border-gray-700 hover:bg-gray-800">
+                  <td className="p-3 border border-gray-700">{user.username}</td>
+                  <td className="p-3 border border-gray-700">{user.email}</td>
+                  <td className="p-3 border border-gray-700">{user.role}</td>
+                  <td className="p-3 border border-gray-700">
                     <div>Total: {user.characterCount}</div>
-                    <div className="text-green-600">Approved: {user.approvedCharacterCount}</div>
-                    <div className="text-amber-600">Pending: {user.pendingCharacterCount}</div>
+                    <div className="text-green-400">Approved: {user.approvedCharacterCount}</div>
+                    <div className="text-yellow-400">Pending: {user.pendingCharacterCount}</div>
                   </td>
-                  <td className="p-3 border">{new Date(user.createdAt).toLocaleDateString()}</td>
-                  <td className="p-3 border">
+                  <td className="p-3 border border-gray-700">{new Date(user.createdAt).toLocaleDateString()}</td>
+                  <td className="p-3 border border-gray-700">
                     <button 
                       className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
                       onClick={() => router.push(`/admin/users/${user.id}`)}
@@ -120,7 +130,7 @@ export default function AdminUsersPage() {
         </div>
         
         {users.length === 0 && (
-          <div className="text-center p-8 text-gray-500">No users found</div>
+          <div className="text-center p-8 text-gray-400">No users found</div>
         )}
       </main>
     </div>

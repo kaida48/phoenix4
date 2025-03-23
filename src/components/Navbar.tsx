@@ -1,198 +1,195 @@
 "use client";
 
-import { useState } from "react";
-import { useSession, signOut } from "next-auth/react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
-  const { data: session, status } = useSession();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const { data: session } = useSession();
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Check if user is an admin
+  const isAdmin = session?.user?.role === "ADMIN";
+
+  // For debugging
+  useEffect(() => {
+    if (session) {
+      // For debugging purposes, replace console.log with a proper logging mechanism if needed.
+      // Example: logUserRole(session?.user?.role);
+    }
+  }, [session]);
+  
+  // Helper to set active link style
+  const isActive = (path: string) => {
+    return pathname.startsWith(path) ? "text-blue-300" : "hover:text-blue-300";
+  };
 
   return (
-    <nav className="bg-gray-800 border-b border-gray-700">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="bg-gray-800 text-white">
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center py-4">
           <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <Link href="/" className="text-white text-xl font-bold">
-                Phoenix RP
-              </Link>
-            </div>
-            {status === "authenticated" && (
-              <div className="hidden md:block ml-10">
-                <div className="flex items-baseline space-x-4">
-                  <Link
-                    href="/characters"
-                    className="text-gray-300 hover:text-white"
-                  >
-                    Characters
-                  </Link>
-                  <Link
-                    href="/characters/create"
-                    className="text-gray-300 hover:text-white"
-                  >
-                    Create Character
-                  </Link>
-                  {session.user.role === "ADMIN" && (
-                    <Link
-                      href="/admin"
-                      className="text-gray-300 hover:text-white"
-                    >
-                      Admin Panel
-                    </Link>
-                  )}
-                </div>
-              </div>
-            )}
+            <Link href="/" className="text-xl font-bold">
+              Phoenix Roleplay
+            </Link>
           </div>
-          <div className="hidden md:block">
-            <div className="ml-4 flex items-center md:ml-6">
-              {status === "authenticated" ? (
-                <>
-                  <span className="text-gray-300 mr-4">
-                    {session.user.name || session.user.email}
-                  </span>
-                  <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    className="bg-gray-600 hover:bg-gray-500 text-white px-3 py-2 rounded"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/login"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    className="ml-2 bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded"
-                  >
-                    Register
-                  </Link>
-                </>
-              )}
-            </div>
-          </div>
-          <div className="-mr-2 flex md:hidden">
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
             <button
-              onClick={toggleMenu}
-              type="button"
-              className="bg-gray-800 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
-              aria-controls="mobile-menu"
-              aria-expanded={isMenuOpen}
+              onClick={() => setIsOpen(!isOpen)}
+              className="text-white focus:outline-none"
+              aria-label="Toggle mobile menu"
             >
-              <span className="sr-only">Open main menu</span>
-              {isMenuOpen ? (
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="block h-6 w-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
             </button>
           </div>
-        </div>
-      </div>
-      
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden" id="mobile-menu">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link
-              href="/"
-              className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700"
-            >
-              Home
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex space-x-6 items-center">
+            <Link href="/characters" className={isActive("/characters")}>
+              My Characters
             </Link>
-            {status === "authenticated" && (
-              <>
-                <Link
-                  href="/characters"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700"
-                >
-                  Characters
-                </Link>
-                <Link
-                  href="/characters/create"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700"
-                >
-                  Create Character
-                </Link>
-                {session.user.role === "ADMIN" && (
-                  <Link
-                    href="/admin"
-                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700"
-                  >
-                    Admin Panel
-                  </Link>
-                )}
-              </>
+            <Link href="/guides" className={isActive("/guides")}>
+              Game Guides
+            </Link>
+            
+            {/* Admin Links - Only shown if user is admin */}
+            {isAdmin && (
+              <div className="relative group">
+                <button className="hover:text-blue-300 flex items-center">
+                  Admin
+                  <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 ease-in-out z-50">
+                  <div className="py-1">
+                    <Link href="/admin" className="block px-4 py-2 hover:bg-gray-600">
+                      Dashboard
+                    </Link>
+                    <Link href="/admin/characters/pending" className="block px-4 py-2 hover:bg-gray-600">
+                      Pending Characters
+                    </Link>
+                    <Link href="/admin/users" className="block px-4 py-2 hover:bg-gray-600">
+                      Manage Users
+                    </Link>
+                  </div>
+                </div>
+              </div>
             )}
-            {status !== "authenticated" && (
-              <>
-                <Link
-                  href="/login"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700"
-                >
-                  Register
-                </Link>
-              </>
+            
+            {session ? (
+              <div className="relative group">
+                <button className="hover:text-blue-300 flex items-center">
+                  <div className="flex items-center">
+                    {session.user?.name || session.user?.username || session.user?.email}
+                    {/* Admin Badge */}
+                    {isAdmin && (
+                      <span className="ml-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded">
+                        ADMIN
+                      </span>
+                    )}
+                  </div>
+                  <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-700 ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition duration-200 ease-in-out z-50">
+                  <div className="py-1">
+                    <Link href="/profile" className="block px-4 py-2 hover:bg-gray-600">
+                      Profile
+                    </Link>
+                    {isAdmin && (
+                      <Link href="/admin" className="block px-4 py-2 hover:bg-gray-600">
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => signOut()}
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-600 text-red-400"
+                    >
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link href="/login" className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+                Sign In
+              </Link>
             )}
           </div>
-          {status === "authenticated" && (
-            <div className="pt-4 pb-3 border-t border-gray-700 px-5">
-              <div className="flex items-center">
-                <div className="flex-1">
-                  <span className="text-gray-300">
-                    {session.user.name || session.user.email}
+        </div>
+
+        {/* Mobile Navigation */}
+        {isOpen && (
+          <div className="md:hidden py-4 border-t border-gray-700">
+            <Link href="/characters" className="block py-2">
+              My Characters
+            </Link>
+            <Link href="/guides" className="block py-2">
+              Game Guides
+            </Link>
+            
+            {/* Mobile Admin Links */}
+            {isAdmin && (
+              <div className="border-t border-gray-700 pt-2 mt-2">
+                <div className="font-semibold mb-1 flex items-center">
+                  Admin
+                  <span className="ml-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded">
+                    ADMIN
                   </span>
                 </div>
+                <Link href="/admin" className="block py-2 pl-4">
+                  Dashboard
+                </Link>
+                <Link href="/admin/characters/pending" className="block py-2 pl-4">
+                  Pending Characters
+                </Link>
+                <Link href="/admin/users" className="block py-2 pl-4">
+                  Manage Users
+                </Link>
+              </div>
+            )}
+            
+            {session ? (
+              <div className="border-t border-gray-700 pt-2 mt-2">
+                <div className="flex items-center py-2">
+                  <span>{session.user?.name || session.user?.username || session.user?.email}</span>
+                  {/* Admin Badge for mobile */}
+                  {isAdmin && (
+                    <span className="ml-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded">
+                      ADMIN
+                    </span>
+                  )}
+                </div>
+                <Link href="/profile" className="block py-2">
+                  Profile
+                </Link>
                 <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="ml-auto px-3 py-2 border border-gray-600 rounded-md text-sm font-medium text-white hover:bg-gray-700"
+                  onClick={() => signOut()}
+                  className="block py-2 w-full text-left text-red-400"
                 >
-                  Logout
+                  Sign Out
                 </button>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            ) : (
+              <Link href="/login" className="block mt-4 bg-blue-600 text-center px-4 py-2 rounded">
+                Sign In
+              </Link>
+            )}
+          </div>
+        )}
+      </div>
     </nav>
   );
 }
