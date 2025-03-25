@@ -5,8 +5,227 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AdminNav from '@/components/AdminNav';
+import LogsTab from '@/components/LogsTab';
 
-// Define comprehensive types for our data
+// Terminal Notification Component
+function TerminalNotification({ message, onClose }: { message: string, onClose: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      onClose();
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div style={styles.notification}>
+      <div style={styles.notificationHeader}>
+        &gt; SYSTEM_ALERT
+      </div>
+      <div style={styles.notificationContent}>
+        {message}
+      </div>
+    </div>
+  );
+}
+
+// Define styles object
+const styles = {
+  // Container styles
+  terminalContainer: {
+    backgroundColor: '#0a0a0a',
+    color: '#d89e54', // Amber color similar to Fallout terminals
+    fontFamily: "'Courier New', monospace",
+    minHeight: '100vh',
+    position: 'relative' as const,
+    padding: '20px',
+    backgroundImage: 'radial-gradient(rgba(16, 16, 16, 0.4) 30%, rgba(0, 0, 0, 0.8) 70%)'
+  },
+  scanlines: {
+    position: 'fixed' as const,
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundImage: 'linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%)',
+    backgroundSize: '100% 4px',
+    pointerEvents: 'none' as const,
+    zIndex: 2,
+    opacity: 0.4,
+  },
+  terminalContent: {
+    position: 'relative' as const,
+    zIndex: 1,
+    borderRadius: '4px',
+    padding: '20px',
+    border: '1px solid #444',
+    boxShadow: '0 0 20px rgba(216, 158, 84, 0.1)'
+  },
+  // Header styles
+  terminalHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderBottom: '2px solid #444',
+    paddingBottom: '15px',
+    marginBottom: '20px'
+  },
+  terminalTitle: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  terminalPrompt: {
+    color: '#d89e54',
+    marginRight: '10px',
+    fontSize: '24px',
+    fontWeight: 'bold',
+  },
+  h1: {
+    margin: 0,
+    fontSize: '24px',
+    letterSpacing: '1px',
+    textTransform: 'uppercase' as const
+  },
+  // Button styles
+  terminalBtn: {
+    backgroundColor: '#262626',
+    color: '#d89e54',
+    border: '1px solid #444',
+    padding: '8px 16px',
+    marginLeft: '10px',
+    cursor: 'pointer',
+    fontFamily: "'Courier New', monospace",
+    fontSize: '14px',
+    textTransform: 'uppercase' as const,
+    transition: 'all 0.2s',
+    position: 'relative' as const
+  },
+  dangerBtn: {
+    borderColor: '#a83232',
+  },
+  // Tab navigation
+  terminalTabs: {
+    display: 'flex',
+    marginBottom: '20px',
+    borderBottom: '1px solid #444'
+  },
+  terminalTab: {
+    backgroundColor: 'transparent',
+    color: '#999',
+    border: 'none',
+    padding: '8px 16px',
+    marginRight: '10px',
+    cursor: 'pointer',
+    fontFamily: "'Courier New', monospace",
+    fontSize: '16px',
+    borderBottom: '2px solid transparent',
+    transition: 'all 0.2s',
+  },
+  activeTab: {
+    color: '#d89e54',
+    borderBottom: '2px solid #d89e54',
+  },
+  terminalSection: {
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    padding: '20px',
+    border: '1px solid #444',
+    lineHeight: 1.6,
+  },
+  // Strong text styling
+  strong: {
+    color: '#d89e54',
+    fontWeight: 'bold',
+  },
+  // Data row styling
+  dataRow: {
+    marginBottom: '8px',
+    display: 'flex',
+  },
+  label: {
+    minWidth: '180px',
+    color: '#b7b7b7',
+  },
+  value: {
+    color: '#d89e54',
+  },
+  // Character card
+  characterCard: {
+    border: '1px solid #444',
+    padding: '15px',
+    marginBottom: '15px',
+    backgroundColor: 'rgba(40, 40, 40, 0.5)',
+  },
+  // Security controls
+  securityBtn: {
+    backgroundColor: '#262626',
+    color: '#d89e54',
+    border: '1px solid #444',
+    padding: '8px 16px',
+    marginRight: '10px',
+    marginBottom: '15px',
+    cursor: 'pointer',
+    fontFamily: "'Courier New', monospace",
+    fontSize: '14px',
+  },
+  // Notification styles
+  notification: {
+    position: 'fixed' as const,
+    top: '20px',
+    right: '20px',
+    backgroundColor: '#0a0a0a',
+    border: '1px solid #d89e54',
+    color: '#d89e54',
+    padding: '10px',
+    zIndex: 1000,
+    fontFamily: "'Courier New', monospace",
+    maxWidth: '300px',
+    boxShadow: '0 0 10px rgba(216, 158, 84, 0.3)',
+  },
+  notificationHeader: {
+    borderBottom: '1px solid #444',
+    paddingBottom: '5px',
+    marginBottom: '5px',
+    fontWeight: 'bold',
+  },
+  notificationContent: {
+    padding: '5px 0',
+  },
+  // Loading and error states
+  loadingContainer: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: '50vh',
+    backgroundColor: '#0a0a0a',
+    color: '#d89e54',
+    fontFamily: "'Courier New', monospace",
+  },
+  loadingText: {
+    fontSize: '18px',
+    marginTop: '20px',
+  },
+  loadingDots: {
+    display: 'inline-block',
+    animation: 'loading 1.5s infinite',
+  },
+  errorContainer: {
+    padding: '20px',
+    backgroundColor: '#0a0a0a',
+    color: '#d89e54',
+    fontFamily: "'Courier New', monospace",
+  },
+  backButton: {
+    backgroundColor: '#262626',
+    color: '#d89e54',
+    border: '1px solid #444',
+    padding: '8px 16px',
+    marginTop: '20px',
+    cursor: 'pointer',
+    fontFamily: "'Courier New', monospace",
+  }
+};
+
 interface Character {
   id: string;
   name: string;
@@ -36,30 +255,36 @@ interface User {
   characters: Character[];
 }
 
-export default function UserDetailsPage({ params }: { params: { id: string } }) {
+export default function AdminUserDetailsPage({ params }: { params: { id: string } }) {
   const { id } = params;
-  
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
-  const [impersonationToken, setImpersonationToken] = useState<string | null>(null);
-  const { data: session, status } = useSession();
+  const [, setImpersonationToken] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
+  const { data: session } = useSession();
   const router = useRouter();
-  
+
+  useEffect(() => {
+    if (!session) {
+      setNotification('Unauthorized access. Redirecting to login.');
+      setTimeout(() => router.push('/login'), 1500);
+    }
+  }, [session, router]);
+
   useEffect(() => {
     fetchUserDetails();
   }, [id]);
-  
+
   const fetchUserDetails = async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/admin/users/${id}`);
-      
       if (!response.ok) {
-        throw new Error(`Error fetching user: ${response.status}`);
+        const errorBody = await response.text();
+        throw new Error(`Error fetching user: ${response.status} - ${errorBody}`);
       }
-      
       const data = await response.json();
       setUser(data);
     } catch (err) {
@@ -69,481 +294,320 @@ export default function UserDetailsPage({ params }: { params: { id: string } }) 
       setLoading(false);
     }
   };
-  
-  // Generate auth token for this user
+
+  const updateUserRole = async (newRole: string) => {
+    if (window.confirm(`Are you sure you want to change ${user?.username}'s role to ${newRole}?`)) {
+      try {
+        const response = await fetch(`/api/admin/users/${id}/role`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user?.email, role: newRole })
+        });
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        fetchUserDetails();
+        setNotification(`User role changed to ${newRole} successfully.`);
+      } catch (error) {
+        console.error('Failed to update user role:', error);
+        setNotification('Failed to update user role. Check console for details.');
+      }
+    }
+  };
+
   const generateToken = async () => {
     try {
-      const response = await fetch(`/api/admin/users/${id}/token`, {
-        method: 'POST'
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      
-      // Refresh user details
+      const response = await fetch(`/api/admin/users/${id}/token`, { method: 'POST' });
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
+      const data = await response.json();
+      console.log('Token generated:', data);
       fetchUserDetails();
+      setNotification('Authentication token generated successfully.');
     } catch (error) {
       console.error('Failed to generate token:', error);
+      setNotification('Failed to generate token. Check console for details.');
     }
   };
-  
-  // Revoke auth token for this user
+
   const revokeToken = async () => {
     try {
-      const response = await fetch(`/api/admin/users/${id}/token`, {
-        method: 'DELETE'
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      
-      // Refresh user details
+      const response = await fetch(`/api/admin/users/${id}/token`, { method: 'DELETE' });
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
       fetchUserDetails();
+      setNotification('Authentication token revoked successfully.');
     } catch (error) {
       console.error('Failed to revoke token:', error);
+      setNotification('Failed to revoke token. Check console for details.');
     }
   };
-  
-  // Start impersonating this user
+
   const startImpersonation = async () => {
     try {
       const response = await fetch('/api/admin/impersonate', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId: id })
       });
-      
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      
+      if (!response.ok) throw new Error(`Error: ${response.status}`);
       const data = await response.json();
       setImpersonationToken(data.token);
-      
-      // Store impersonation token in localStorage
-      localStorage.setItem('impersonationToken', data.token);
-      localStorage.setItem('impersonatedUser', user?.username || '');
-      
-      alert(`Now impersonating ${user?.username}. Navigate to any page to see the site as this user.`);
+      setNotification(`Now impersonating ${user?.username}. Navigate to any page to see results.`);
     } catch (error) {
       console.error('Failed to start impersonation:', error);
-    }
-  };
-  
-  // Update user role
-  const updateUserRole = async (newRole: string) => {
-    if (confirm(`Are you sure you want to change ${user?.username}'s role to ${newRole}?`)) {
-      try {
-        const response = await fetch(`/api/admin/promote`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ email: user?.email, role: newRole })
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
-        }
-        
-        // Refresh user details
-        fetchUserDetails();
-        
-        alert(`User role changed to ${newRole} successfully.`);
-      } catch (error) {
-        console.error('Failed to update user role:', error);
-      }
+      setNotification('Failed to start impersonation. Check console for details.');
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div style={styles.loadingContainer}>
         <AdminNav />
-        <div className="container mx-auto p-6 text-center">Loading user details...</div>
+        <div style={styles.loadingText}>
+          LOADING USER DATA<span style={styles.loadingDots}>...</span>
+        </div>
       </div>
     );
   }
-  
+
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div style={styles.errorContainer}>
         <AdminNav />
-        <div className="container mx-auto p-6 text-center text-red-500">Error: {error}</div>
+        <div>ERROR: {error}</div>
+        <button 
+          style={styles.backButton} 
+          onClick={() => router.push('/admin/users')}
+        >
+          &lt; BACK TO USERS
+        </button>
       </div>
     );
   }
-  
+
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div style={styles.errorContainer}>
         <AdminNav />
-        <div className="container mx-auto p-6 text-center">User not found</div>
+        <div>
+          <div>USER_NOT_FOUND</div>
+          <div>ERROR_CODE: 404</div>
+          <div style={{ marginTop: '15px' }}>
+            <Link href="/admin/users" style={{ color: '#d89e54' }}>
+              &lt; RETURN_TO_DIRECTORY
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
-  
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={styles.terminalContainer}>
+      <div style={styles.scanlines}></div>
       <AdminNav />
-      <div className="container mx-auto p-6">
-        <div className="mb-4">
-          <Link href="/admin/users" className="text-blue-600 hover:underline">
-            &larr; Back to Users
-          </Link>
-        </div>
+      <div style={styles.terminalContent}>
+        <header style={styles.terminalHeader}>
+          <div style={styles.terminalTitle}>
+            <span style={styles.terminalPrompt}>&gt;</span>
+            <h1 style={styles.h1}>USER_PROFILE [ID: {user.id.substring(0, 8)}...]</h1>
+          </div>
+          <div>
+            <button 
+              style={{...styles.terminalBtn}}
+              onClick={() => updateUserRole(user.role === 'ADMIN' ? 'USER' : 'ADMIN')}
+            >
+              {user.role === 'ADMIN' ? 'REVOKE_ADMIN' : 'GRANT_ADMIN'}
+            </button>
+            <button 
+              style={{...styles.terminalBtn, ...styles.dangerBtn}}
+              onClick={startImpersonation}
+            >
+              IMPERSONATE_USER
+            </button>
+          </div>
+        </header>
         
-        {/* User Header */}
-        <div className="bg-white shadow rounded-lg p-6 mb-6">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+        <nav style={styles.terminalTabs}>
+          {['overview', 'characters', 'security', 'logs'].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              style={{
+                ...styles.terminalTab,
+                ...(activeTab === tab ? styles.activeTab : {})
+              }}
+            >
+              {tab.toUpperCase()}
+            </button>
+          ))}
+        </nav>
+        
+        <section style={styles.terminalSection}>
+          {activeTab === 'overview' && (
             <div>
-              <h1 className="text-2xl font-bold">
-                {user.username}
-                <span className={`ml-2 text-sm ${user.role === 'ADMIN' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'} px-2 py-1 rounded-full`}>
-                  {user.role}
-                </span>
-              </h1>
-              <p className="text-gray-500">{user.email}</p>
-            </div>
-            <div className="flex mt-4 md:mt-0 space-x-2">
-              <button
-                onClick={startImpersonation}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded"
-              >
-                Impersonate
-              </button>
-              <div className="relative inline-block text-left">
-                <div className="dropdown">
-                  <button
-                    className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-                  >
-                    Actions
-                    <svg className="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                    </svg>
-                  </button>
-                  <div className="dropdown-menu origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 z-10">
-                    <div className="py-1">
-                      <button
-                        onClick={() => updateUserRole('ADMIN')}
-                        disabled={user.role === 'ADMIN'}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
-                      >
-                        Make Admin
-                      </button>
-                      <button
-                        onClick={() => updateUserRole('USER')}
-                        disabled={user.role === 'USER'}
-                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50"
-                      >
-                        Make User
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Tab Navigation */}
-        <div className="flex border-b mb-6">
-          <button
-            onClick={() => setActiveTab('overview')}
-            className={`py-2 px-4 ${activeTab === 'overview' ? 'border-b-2 border-blue-500 font-medium' : 'text-gray-500'}`}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setActiveTab('characters')}
-            className={`py-2 px-4 ${activeTab === 'characters' ? 'border-b-2 border-blue-500 font-medium' : 'text-gray-500'}`}
-          >
-            Characters ({user.characterCount})
-          </button>
-          <button
-            onClick={() => setActiveTab('security')}
-            className={`py-2 px-4 ${activeTab === 'security' ? 'border-b-2 border-blue-500 font-medium' : 'text-gray-500'}`}
-          >
-            Security
-          </button>
-          <button
-            onClick={() => setActiveTab('raw')}
-            className={`py-2 px-4 ${activeTab === 'raw' ? 'border-b-2 border-blue-500 font-medium' : 'text-gray-500'}`}
-          >
-            Raw Data
-          </button>
-        </div>
-        
-        {/* Overview Tab */}
-        {activeTab === 'overview' && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <h2 className="text-lg font-semibold mb-4">Account Information</h2>
-                <table className="w-full">
-                  <tbody>
-                    <tr className="border-b">
-                      <td className="py-2 font-medium">Username</td>
-                      <td className="py-2">{user.username}</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-2 font-medium">Email</td>
-                      <td className="py-2">{user.email}</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-2 font-medium">Display Name</td>
-                      <td className="py-2">{user.name || 'Not set'}</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-2 font-medium">Role</td>
-                      <td className="py-2">{user.role}</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-2 font-medium">Email Verified</td>
-                      <td className="py-2">
-                        {user.emailVerified ? (
-                          <span className="text-green-600">Yes</span>
-                        ) : (
-                          <span className="text-red-600">No</span>
-                        )}
-                      </td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-2 font-medium">Created</td>
-                      <td className="py-2">{new Date(user.createdAt).toLocaleString()}</td>
-                    </tr>
-                    <tr className="border-b">
-                      <td className="py-2 font-medium">Last Updated</td>
-                      <td className="py-2">{new Date(user.updatedAt).toLocaleString()}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+              <h2>&gt; USER_DETAILS</h2>
               
-              <div>
-                <h2 className="text-lg font-semibold mb-4">Character Statistics</h2>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span>Approved Characters</span>
-                      <span className="text-green-600 font-medium">{user.approvedCharacterCount}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-green-600 h-2.5 rounded-full" style={{ 
-                        width: `${user.characterCount ? (user.approvedCharacterCount / user.characterCount * 100) : 0}%` 
-                      }}></div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span>Pending Characters</span>
-                      <span className="text-amber-600 font-medium">{user.pendingCharacterCount}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-amber-500 h-2.5 rounded-full" style={{ 
-                        width: `${user.characterCount ? (user.pendingCharacterCount / user.characterCount * 100) : 0}%` 
-                      }}></div>
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <div className="flex justify-between mb-1">
-                      <span>Rejected Characters</span>
-                      <span className="text-red-600 font-medium">{user.rejectedCharacterCount}</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2.5">
-                      <div className="bg-red-600 h-2.5 rounded-full" style={{ 
-                        width: `${user.characterCount ? (user.rejectedCharacterCount / user.characterCount * 100) : 0}%` 
-                      }}></div>
-                    </div>
-                  </div>
-                </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>ID:</span>
+                <span style={styles.value}>{user.id}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>USERNAME:</span>
+                <span style={styles.value}>{user.username}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>EMAIL:</span>
+                <span style={styles.value}>{user.email}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>NAME:</span>
+                <span style={styles.value}>{user.name || 'N/A'}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>ROLE:</span>
+                <span style={styles.value}>{user.role}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>CREATED_AT:</span>
+                <span style={styles.value}>{user.createdAt}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>UPDATED_AT:</span>
+                <span style={styles.value}>{user.updatedAt}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>EMAIL_VERIFIED:</span>
+                <span style={styles.value}>{user.emailVerified ? 'YES' : 'NO'}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>TOTAL_CHARACTERS:</span>
+                <span style={styles.value}>{user.characterCount}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>APPROVED_CHARACTERS:</span>
+                <span style={styles.value}>{user.approvedCharacterCount}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>PENDING_CHARACTERS:</span>
+                <span style={styles.value}>{user.pendingCharacterCount}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>REJECTED_CHARACTERS:</span>
+                <span style={styles.value}>{user.rejectedCharacterCount}</span>
               </div>
             </div>
-          </div>
-        )}
-        
-        {/* Characters Tab */}
-        {activeTab === 'characters' && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Characters</h2>
-            
-            {user.characters.length === 0 ? (
-              <p className="text-gray-500">This user has no characters.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {user.characters.map((character) => (
-                  <div key={character.id} className="border rounded-lg overflow-hidden bg-gray-50">
-                    <div className={`px-4 py-2 ${character.approved ? 'bg-green-100' : character.rejected ? 'bg-red-100' : 'bg-yellow-100'}`}>
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-medium">{character.name}</h3>
-                        <span className={`text-xs px-2 py-1 rounded-full ${
-                          character.approved ? 'bg-green-200 text-green-800' : 
-                          character.rejected ? 'bg-red-200 text-red-800' : 
-                          'bg-yellow-200 text-yellow-800'
-                        }`}>
-                          {character.approved ? 'Approved' : character.rejected ? 'Rejected' : 'Pending'}
-                        </span>
+          )}
+
+          {activeTab === 'characters' && (
+            <div>
+              <h2>&gt; CHARACTER_RECORDS</h2>
+              {user.characters.length > 0 ? (
+                user.characters.map((character) => (
+                  <div key={character.id} style={styles.characterCard}>
+                    <div style={styles.dataRow}>
+                      <span style={styles.label}>NAME:</span>
+                      <span style={styles.value}>{character.name}</span>
+                    </div>
+                    <div style={styles.dataRow}>
+                      <span style={styles.label}>FACTION:</span>
+                      <span style={styles.value}>{character.faction}</span>
+                    </div>
+                    <div style={styles.dataRow}>
+                      <span style={styles.label}>STATUS:</span>
+                      <span style={styles.value}>
+                        {character.approved ? 'APPROVED' : character.rejected ? 'REJECTED' : 'PENDING'}
+                      </span>
+                    </div>
+                    <div style={styles.dataRow}>
+                      <span style={styles.label}>CREATED:</span>
+                      <span style={styles.value}>{character.createdAt}</span>
+                    </div>
+                    <details>
+                      <summary style={{ color: '#b7b7b7', cursor: 'pointer', marginTop: '8px' }}>
+                        VIEW_DETAILS
+                      </summary>
+                      <div style={{ marginTop: '10px', padding: '0 10px' }}>
+                        <div style={styles.dataRow}>
+                          <span style={styles.label}>ID:</span>
+                          <span style={styles.value}>{character.id}</span>
+                        </div>
+                        <div style={{ margin: '10px 0' }}>
+                          <div style={{ color: '#b7b7b7', marginBottom: '5px' }}>BACKSTORY:</div>
+                          <div style={{ 
+                            color: '#d89e54', 
+                            backgroundColor: 'rgba(0,0,0,0.2)', 
+                            padding: '10px', 
+                            maxHeight: '150px', 
+                            overflowY: 'auto'
+                          }}>
+                            {character.backstory}
+                          </div>
+                        </div>
+                        {character.appearance && (
+                          <div style={{ margin: '10px 0' }}>
+                            <div style={{ color: '#b7b7b7', marginBottom: '5px' }}>APPEARANCE:</div>
+                            <div style={{ 
+                              color: '#d89e54', 
+                              backgroundColor: 'rgba(0,0,0,0.2)', 
+                              padding: '10px', 
+                              maxHeight: '150px', 
+                              overflowY: 'auto'
+                            }}>
+                              {character.appearance}
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    </div>
-                    <div className="p-4">
-                      <p className="text-sm text-gray-600">Faction: {character.faction}</p>
-                      <p className="text-sm text-gray-600">Created: {new Date(character.createdAt).toLocaleDateString()}</p>
-                      <div className="mt-3 text-sm text-gray-600">
-                        <p className="font-medium">Backstory:</p>
-                        <p className="line-clamp-3">{character.backstory}</p>
-                      </div>
-                      <div className="mt-4 flex justify-end">
-                        <Link href={`/admin/characters/${character.id}`}>
-                          <button className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                            View Details
-                          </button>
-                        </Link>
-                      </div>
-                    </div>
+                    </details>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-        
-        {/* Security Tab */}
-        {activeTab === 'security' && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Security Information</h2>
-            
-            {/* Password section - ADD THIS */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-md font-medium mb-2">Password Information</h3>
-              <div>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600 mb-1">Encrypted Password Hash:</p>
-                    <div className="bg-gray-100 p-2 rounded font-mono text-xs overflow-auto break-all">
-                      {user.password || 'No password hash found'}
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      This is a one-way bcrypt hash. The original password cannot be recovered.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      if (confirm('Are you sure you want to reset this user\'s password?')) {
-                        // Implementation for password reset
-                        alert('Password reset functionality to be implemented');
-                      }
-                    }}
-                    className="ml-2 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
-                  >
-                    Reset Password
-                  </button>
-                </div>
-              </div>
-            </div>
-            
-            {/* Existing token section */}
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-md font-medium mb-2">Authentication Token</h3>
-              {user.authToken ? (
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="bg-gray-100 p-2 rounded font-mono text-sm overflow-auto flex-1 mr-2">
-                      {user.authToken}
-                    </div>
-                    <button
-                      onClick={() => {
-                        navigator.clipboard.writeText(user.authToken || '');
-                        alert('Token copied to clipboard!');
-                      }}
-                      className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    >
-                      Copy
-                    </button>
-                    <button
-                      onClick={revokeToken}
-                      className="ml-2 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                    >
-                      Revoke
-                    </button>
-                  </div>
-                  <p className="text-sm text-gray-500 mt-2">
-                    This token can be used for API authentication and admin impersonation.
-                  </p>
-                </div>
+                ))
               ) : (
-                <div>
-                  <p className="text-gray-500 mb-2">No authentication token has been generated for this user.</p>
-                  <button
-                    onClick={generateToken}
-                    className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-                  >
-                    Generate Token
-                  </button>
-                </div>
+                <p>NO_CHARACTERS_FOUND</p>
               )}
             </div>
-            
-            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-md font-medium mb-2">Email Verification</h3>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p>Status: 
-                    {user.emailVerified ? (
-                      <span className="text-green-600 font-medium ml-2">Verified</span>
-                    ) : (
-                      <span className="text-red-600 font-medium ml-2">Not Verified</span>
-                    )}
-                  </p>
-                  {user.verificationToken && (
-                    <p className="text-sm text-gray-500 mt-1">
-                      Verification token: <span className="font-mono">{user.verificationToken}</span>
-                    </p>
-                  )}
-                </div>
-                {!user.emailVerified && (
-                  <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                    Send Verification Email
-                  </button>
-                )}
-              </div>
-            </div>
-            
+          )}
+
+          {activeTab === 'security' && (
             <div>
-              <h3 className="text-md font-medium mb-2">Account Actions</h3>
-              <div className="flex flex-wrap gap-2">
-                <button className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
-                  Reset Password
+              <h2>&gt; SECURITY_CONTROLS</h2>
+              <div style={{ marginBottom: '20px' }}>
+                <button 
+                  onClick={generateToken} 
+                  style={styles.securityBtn}
+                >
+                  GENERATE_TOKEN
                 </button>
                 <button 
-                  onClick={startImpersonation}
-                  className="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
+                  onClick={revokeToken} 
+                  style={styles.securityBtn}
                 >
-                  Impersonate User
-                </button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                  Disable Account
+                  REVOKE_TOKEN
                 </button>
               </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>AUTH_TOKEN:</span>
+                <span style={styles.value}>{user.authToken || 'NONE'}</span>
+              </div>
+              <div style={styles.dataRow}>
+                <span style={styles.label}>VERIFICATION_TOKEN:</span>
+                <span style={styles.value}>{user.verificationToken || 'NONE'}</span>
+              </div>
             </div>
-          </div>
-        )}
-        
-        {/* Raw Data Tab */}
-        {activeTab === 'raw' && (
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Raw User Data</h2>
-            <div className="bg-gray-100 p-4 rounded-lg overflow-auto">
-              <pre className="text-xs">{JSON.stringify(user, null, 2)}</pre>
+          )}
+
+          {activeTab === 'logs' && (
+            <div>
+              <h2>&gt; USER_ACTIVITY_LOGS</h2>
+              <LogsTab user={user} />
             </div>
-          </div>
-        )}
+          )}
+        </section>
       </div>
+      
+      {notification && (
+        <TerminalNotification
+          message={notification}
+          onClose={() => setNotification(null)}
+        />
+      )}
     </div>
   );
 }
