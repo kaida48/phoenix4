@@ -1,136 +1,132 @@
-# Project Phoenix - The Official Hub
+# Project Phoenix - Our Website
 
 > domain = project-phoenix.online
 
-The central platform for everything related to the Phoenix Roleplay universe.
+Welcome to the main hangout spot for everything about the Phoenix Roleplay universe!
 
 ## Vision & Purpose
 
-Project Phoenix will serve as the definitive central hub for the Phoenix Roleplay community. Far more than just a character database, this platform will become:
+Project Phoenix is set to be the ultimate destination for the Phoenix Roleplay community. It’s not just a character database; it’s gonna be:
 
-- **The Gateway**: The first touchpoint for newcomers discovering the Phoenix universe
-- **The Library**: A comprehensive repository of lore, faction information, and world history
-- **The Workshop**: Where players craft and submit their characters for approval
-- **The Administrative Hub**: Where moderators and admins manage the roleplay community
+- **The Gateway**: The first place for newbies to explore the Phoenix universe
+- **The Library**: A full collection of stories, factions, and all that world history
+- **The Workshop**: A space for players to create and submit their characters for approval
+- **The Admin Center**: The spot where mods and admins keep an eye on the roleplay scene
 
 ## Core Features
 
 ### World Immersion
 
-- **Interactive World Map**: Explore the Sunrise Isles with location-specific lore
-- **Faction Profiles**: Detailed information about each faction's history, values, and territories
-- **Timeline of Events**: Chronological documentation of major world events
-- **Media Gallery**: Artwork, music, and other media that brings the world to life
+- **Interactive World Map**: Check out the Sunrise Isles and learn about every spot
+- **Faction Profiles**: Get the lowdown on each faction’s history, values, and territories
+- **Timeline of Events**: A chronological rundown of major events in the world
+- **Media Gallery**: Art, music, and other cool stuff that bring the world to life
 
 ### Character System
 
-- **Character Creation**: Intuitive interface for building detailed characters
-- **Approval Workflow**: Streamlined submission and review process
-- **Character Portfolios**: Public and private views of character information
-- **Character Relationships**: Visualize connections between different characters
+- **Character Creation**: Super easy tools for crafting your unique characters
+- **Approval Process**: A straightforward way to submit and get characters reviewed
+- **Character Portfolios**: View character info that's either public or private
+- **Character Relationships**: See how characters are linked up
 
 ### Community Features
 
-- **Forums/Discussion Boards**: Organized by faction and topic
-- **Events Calendar**: Schedule of upcoming roleplay events
-- **Player Directory**: Find other players and their characters
+- **Forums/Discussion Boards**: Organized by faction and topic to chat easily
+- **Events Calendar**: A schedule of upcoming roleplay events so you don’t miss out
+- **Player Directory**: Find other players and check out their characters
 
 ### Administrative Tools
 
-- **Moderation Dashboard**: Comprehensive tools for community management
-- **Content Management**: Easy updating of world information and news
-- **Analytics**: Insights into community engagement and growth
-- **Announcement System**: Broadcast important updates to all users
+- **Moderation Dashboard**: Tools that help manage the community smoothly
+- **Content Management**: Easy updates for world info and news
+- **Analytics**: Insights on how active the community is and how it’s growing
+- **Announcement System**: A way to share important updates with everyone
 
 ## Development Status
 
-This project is currently in active development, with the following components being prioritized:
+We’re actively working on this project and kicking things off in these areas:
 
 ### What We've Accomplished So Far
 
 ✅ **User Authentication**
 
-- Registration with username/email/password
-- Login functionality
-- Role-based access control (USER, MODERATOR, ADMIN)
+- Users can sign up with a username, email, and password
+- Smooth login experience
+- Controls based on user roles (USER, MODERATOR, ADMIN)
 
 ✅ **Database Structure**
 
-- User model with proper relationships
-- Character model with faction types
-- Migration for adding username field
-- JSON fields for character attributes (skills, relationships)
+- A user model that links different accounts
+- A character model with various faction types
+- Added features for usernames
+- Fields for character details like skills and relationships
 
 ✅ **Admin System**
 
-- Admin dashboard to view characters
-- Ability to approve/reject characters
-- User role management
+- An admin dashboard for checking out characters
+- The ability to approve or deny characters
+- Managing user roles easily
 
 ✅ **Character System**
 
-- Basic character creation
-- Character listing
-- Approval workflow
+- Basic functions to create characters
+- A character list to browse
+- An approval process for characters
 
-### What Still Needs to be Implemented
+### What Still Needs to Be Implemented
 
-1. ~~**Character Detail Page**~~
-   - ~~Complete implementation to view all character details~~
-   - ~~Add navigation between character views~~
+1. **Character Detail Page**
+   - Create a page where users can view all character details and switch between them
 
-2. ~~**Consistent Navbar**~~
-   - ~~Create a shared Navbar.tsx component~~
-   - ~~Ensure it appears consistently on all pages~~
+2. **Consistent Navbar**
+   - Set up a navigation bar that shows up on every page 
 
-3. **~~Character Rejection System~~**
-   - ~~Add explicit rejection functionality~~
-   - ~~Implement notifications for rejected characters~~
-   - ~~Add auto-delete or manual delete options~~
+3. **Character Rejection System**
+   - Let admins reject characters and notify users about it
 
 4. **Item Source Tracking**
-   - Add fields for how characters obtained items
-   - Create selectable item list
-   - Update character creation form
+   - Keep track of how characters got their items
+   - Make a list of items to choose from
+   - Update character creation forms
 
 5. **Character Editing**
-   - Complete edit functionality
-   - Implement re-approval requirements
-   - Preserve character history
+   - Allow users to tweak their characters
+   - Set up a re-approval process for edited characters
+   - Keep a history of character changes
 
 6. **Email Verification**
-   - Set up email sending functionality
-   - Create verification flow
-   - Add password reset capability
+   - Set up email sending functions
+   - Create a way for users to verify their accounts
+   - Add options for password resets
 
 7. **Auth Token System**
-   - Generate unique tokens for each account
-   - Add admin impersonation capability
+   - Generate unique tokens for accounts
+   - Allow admins to impersonate users if needed
 
 ## Technical Foundation
 
-- **Frontend**: Next.js with React and TailwindCSS
-- **Backend**: Next.js API routes with PostgreSQL database
-- **Authentication**: Secure user accounts with role-based permissions
-- **Responsive Design**: Full functionality across desktop and mobile devices
+- **Frontend**: We’re using Next.js with React and TailwindCSS for the design
+- **Backend**: Built on Next.js API routes with a PostgreSQL database
+- **Authentication**: Users have secure accounts with different permissions
+- **Responsive Design**: Looks great on both computers and mobile devices
 
 ## Accessing the Repository
 
-This repository is primarily used for internal development, version control, and backup purposes. While the code is publicly visible, we are not currently accepting external contributions.
+This repository is mainly for internal development and backups. The code is visible to the public, but we’re not looking for outside contributions right now.
 
 ### For Players
 
-- Follow development updates on our [Discord Server](https://discord.gg/CassDfZnmQ)
-- Just wait for now
+- Keep up with development news on our [Discord Server](https://discord.gg/CassDfZnmQ)
+- Thanks for being patient as we build this out!
 
 ### For Internal Use
 
-- Clone the repository for local development and testing
-- Submit pull requests for code review and integration
+- Clone the repository for local testing and development
+- Send any changes for reviews and integration
 
 ## Development Setup
 
-```bash
+bash
 # Clone the repository
 git clone https://github.com/your-organization/phoenix-roleplay.git
 
@@ -144,116 +140,3 @@ cp .env.example .env.local
 
 # Initialize database
 npx prisma migrate dev
-
-# Start development server
-npm run dev
-```
-
-## The Road Ahead
-
-Project Phoenix is an evolving platform that will grow alongside our roleplay community. Future plans include:
-
----
-
-Join us in building not just a website, but a digital home for the Phoenix Roleplay community—where stories are born, characters come alive, and a rich world awaits exploration.
-
-### - Project Phoenix Administration Team
-
----
-
-> *Hey, here's Kaida, literally the only developer for this site and this project overall. I came up with the ideas, make the website, document, etc. Just know that I put in lots of love and effort in this and I hope you enjoy it ❤️*
-
-## Phoenix Roleplay
-
-A character submission system for the Phoenix roleplay community.
-
-## Features
-
-- User registration and authentication
-- Character creation and submission
-- Character approval system for moderators
-- Admin panel for user management
-- Responsive design
-
-## Setup Instructions
-
-### Prerequisites
-
-- Node.js (v18+)
-- PostgreSQL database
-- npm or yarn
-
-### Installation
-
-1. Clone the repository
-2. Install dependencies:
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
-
-3. Configure environment variables:
-   - Copy `.env.example` to `.env`
-   - Update the DATABASE_URL with your PostgreSQL connection string
-   - Set NEXTAUTH_SECRET to a random secure string
-   - Set NEXTAUTH_URL to your application URL (http://localhost:3000 for development)
-
-4. Set up the database:
-
-   ```bash
-   npx prisma migrate dev
-   # or
-   yarn prisma migrate dev
-   ```
-
-5. Test database connection:
-
-   ```bash
-   npm run test:db
-   # or
-   yarn test:db
-   ```
-
-6. Create an admin user:
-
-   ```bash
-   npm run create:admin
-   # or
-   yarn create:admin
-   ```
-
-7. (Optional) Seed the database with test data:
-
-   ```bash
-   npm run seed:db
-   # or
-   yarn seed:db
-   ```
-
-8. Start the development server:
-
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-## Usage
-
-- Visit http://localhost:3000 to access the application
-- Register a new account or log in with existing credentials
-- Create and manage characters
-- Admins can access the admin panel at /admin
-
-## API Endpoints
-
-- `/api/test-db` - Test database connection
-- `/api/register` - User registration
-- `/api/characters` - Character creation and listing
-- `/api/characters/[id]` - Character details and updates
-- `/api/admin/*` - Admin-only endpoints
-
-## License
-
-This project is licensed under the MIT License.
